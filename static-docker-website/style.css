@@ -1,0 +1,30 @@
+body {
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+    color: #333;
+}
+
+.container {
+    text-align: center;
+    background: #fff;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+button {
+    padding: 10px 20px;
+    background: #ff5e62;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #ff9966;
+}
