@@ -1,11 +1,11 @@
 
-```
+
 ## ❤️ Mohan’s DevOps Static Website Project
 
 Welcome to my **DevOps mini project**!  
 This project demonstrates how to host a **static website** using **Docker**, **Apache HTTP Server**, and **AWS EC2 / S3**, completely automated and version-controlled through **GitHub**.
 
-It’s a simple yet complete DevOps workflow — from **coding → containerization → deployment → hosting**.
+It’s a simple yet complete DevOps workflow → from **coding → containerization → deployment → hosting**.
 
 ---
 
@@ -147,8 +147,11 @@ A simple interactive button is included:
 ## 👨‍💻 About Me
 
 **Name:** Mohan Reddy Bodha
+
 **GitHub:** [github.com/mohanreddybodha](https://github.com/mohanreddybodha)
+
 **DockerHub:** [hub.docker.com/u/mohanreddybodha](https://hub.docker.com/u/mohanreddybodha)
+
 **Email:** [mohanreddybodha05@gmail.com](mailto:mohanreddybodha05@gmail.com)
 
 ---
