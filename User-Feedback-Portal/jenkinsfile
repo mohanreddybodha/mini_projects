@@ -22,6 +22,7 @@ pipeline {
             steps {
                 echo '📦 Cloning repository...'
                 checkout scm
+                echo '✅ Code checkout completed.'
             }
         }
 
@@ -34,6 +35,7 @@ pipeline {
                             cd $APP_DIR/backend
                             npm install
                         '''
+                        echo '✅ Backend dependencies installed.'
                     }
                 }
 
@@ -44,6 +46,7 @@ pipeline {
                             cd $APP_DIR/frontend
                             npm install
                         '''
+                        echo '✅ Frontend dependencies installed.'
                     }
                 }
             }
@@ -58,6 +61,7 @@ pipeline {
                     mkdir -p ../backend/public
                     cp index.html style.css ../backend/public/
                 '''
+                echo '✅ Frontend build and copy completed.'
             }
         }
 
@@ -68,6 +72,7 @@ pipeline {
                     cd $APP_DIR/backend
                     node -e "require('./server'); console.log('✅ Backend loaded successfully')"
                 '''
+                echo '✅ Backend test completed.'
             }
         }
 
@@ -77,6 +82,7 @@ pipeline {
                 sh '''
                     docker build -t $IMAGE_NAME:$IMAGE_TAG $APP_DIR
                 '''
+                echo '✅ Docker image built.'
             }
         }
 
@@ -89,6 +95,7 @@ pipeline {
                         docker rm $CONTAINER_NAME
                     fi
                 '''
+                echo '✅ Old container cleaned up.'
             }
         }
 
@@ -101,6 +108,7 @@ pipeline {
                     --name $CONTAINER_NAME \
                     $IMAGE_NAME:$IMAGE_TAG
                 '''
+                echo '✅ Container deployed.'
             }
         }
 
@@ -108,8 +116,20 @@ pipeline {
             steps {
                 echo '🧼 Cleaning up old Docker images...'
                 sh 'docker image prune -af || true'
+                echo '✅ Docker cleanup completed.'
             }
         }
+
+        // Optional health check (uncomment if needed)
+        // stage('Verify Deployment') {
+        //     steps {
+        //         echo '🔍 Verifying container response...'
+        //         sh '''
+        //             sleep 5
+        //             curl -s http://localhost:$HOST_PORT | grep "Hybrid Showcase Portal" && echo "✅ Frontend is live"
+        //         '''
+        //     }
+        // }
     }
 
     post {
