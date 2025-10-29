@@ -165,7 +165,7 @@ Now open your browser and visit:
 
 👉 [http://localhost](http://localhost) (for local setup)
 or
-👉 [http://<your-ec2-public-ip>](http://<your-ec2-public-ip>) (for AWS EC2)
+👉 [http://<your-ec2-public-ip>](http://<your-ec2-public-ip>) (EC2-Public-Ip)
 
 ---
 
