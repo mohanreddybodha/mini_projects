@@ -15,9 +15,9 @@ RUN if [ -f package.json ]; then npm install; fi
 # RUN npm run build
 
 
-# ------------------------------
+# --------------------------
 # Stage 2: Backend setup
-# ------------------------------
+# --------------------------
 FROM node:alpine
 
 WORKDIR /app/backend
