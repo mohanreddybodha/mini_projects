@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "feedback-web"
+        CONTAINER_NAME = "feedback-container"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Cloning repository...'
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker image...'
+                sh 'docker build -t $IMAGE_NAME .'
+            }
+        }
+
+        stage('Stop Old Container') {
+            steps {
+                echo 'Stopping old container if running...'
+                sh '''
+                    if [ $(docker ps -q -f name=$CONTAINER_NAME) ]; then
+                        docker stop $CONTAINER_NAME
+                        docker rm $CONTAINER_NAME
+                    fi
+                '''
+            }
+        }
+
+        stage('Run New Container') {
+            steps {
+                echo 'Running new container...'
+                sh 'docker run -d -p 3000:3000 --name $CONTAINER_NAME $IMAGE_NAME'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Deployment successful!'
+        }
+        failure {
+            echo '❌ Deployment failed!'
+        }
+    }
+}
