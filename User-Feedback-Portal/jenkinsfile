@@ -71,6 +71,9 @@ pipeline {
                         cd $APP_DIR/frontend
                         npm run build || echo "Static HTML app detected — skipping build."
                     fi
+                    mkdir -p User-Feedback-Portal/backend/public
+                    cp frontend/index.html User-Feedback-Portal/backend/public/
+
                 '''
             }
         }
