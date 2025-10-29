@@ -39,27 +39,13 @@ pipeline {
 
                 stage('Frontend Deps') {
                     steps {
-                        echo '⚙️ Installing frontend dependencies (if package.json exists)...'
+                        echo '⚙️ Installing frontend dependencies...'
                         sh '''
-                            if [ -f $APP_DIR/frontend/package.json ]; then
-                                cd $APP_DIR/frontend
-                                npm install
-                            else
-                                echo "No package.json found — skipping."
-                            fi
+                            cd $APP_DIR/frontend
+                            npm install
                         '''
                     }
                 }
-            }
-        }
-
-        stage('Build Backend') {
-            steps {
-                echo '🔧 Building backend...'
-                sh '''
-                    cd $APP_DIR/backend
-                    npm run build || echo "No build step defined — skipping."
-                '''
             }
         }
 
@@ -67,13 +53,10 @@ pipeline {
             steps {
                 echo '🏗️ Building frontend...'
                 sh '''
-                    if [ -f $APP_DIR/frontend/package.json ]; then
-                        cd $APP_DIR/frontend
-                        npm run build || echo "Static HTML app detected — skipping build."
-                    fi
-                    mkdir -p User-Feedback-Portal/backend/public
-                    cp $APP_DIR/frontend/index.html User-Feedback-Portal/backend/public/
-
+                    cd $APP_DIR/frontend
+                    npm run build || echo "Static HTML app detected — skipping build."
+                    mkdir -p ../backend/public
+                    cp index.html style.css ../backend/public/
                 '''
             }
         }
