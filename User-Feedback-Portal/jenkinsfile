@@ -72,7 +72,7 @@ pipeline {
                         npm run build || echo "Static HTML app detected — skipping build."
                     fi
                     mkdir -p User-Feedback-Portal/backend/public
-                    cp frontend/index.html User-Feedback-Portal/backend/public/
+                    cp $APP_DIR/frontend/index.html User-Feedback-Portal/backend/public/
 
                 '''
             }
