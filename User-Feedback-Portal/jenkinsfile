@@ -3,17 +3,17 @@ pipeline {
 
     environment {
         IMAGE_NAME = "feedback-web"
-        IMAGE_TAG = "build-${BUILD_NUMBER}"
+        IMAGE_TAG = "latest"
         CONTAINER_NAME = "feedback-container"
-        APP_PORT = "5000" // backend port inside container
-        HOST_PORT = "3000" // host port
+        APP_PORT = "5000"
+        HOST_PORT = "3000"
+        APP_DIR = "User-Feedback-Portal"
     }
 
     options {
         skipStagesAfterUnstable()
         timeout(time: 20, unit: 'MINUTES')
         timestamps()
-
     }
 
     stages {
@@ -31,7 +31,7 @@ pipeline {
                     steps {
                         echo '⚙️ Installing backend dependencies...'
                         sh '''
-                            cd backend
+                            cd $APP_DIR/backend
                             npm install
                         '''
                     }
@@ -41,8 +41,8 @@ pipeline {
                     steps {
                         echo '⚙️ Installing frontend dependencies (if package.json exists)...'
                         sh '''
-                            if [ -f frontend/package.json ]; then
-                                cd frontend
+                            if [ -f $APP_DIR/frontend/package.json ]; then
+                                cd $APP_DIR/frontend
                                 npm install
                             else
                                 echo "No package.json found — skipping."
@@ -52,11 +52,12 @@ pipeline {
                 }
             }
         }
+
         stage('Build Backend') {
             steps {
                 echo '🔧 Building backend...'
                 sh '''
-                    cd backend
+                    cd $APP_DIR/backend
                     npm run build || echo "No build step defined — skipping."
                 '''
             }
@@ -66,8 +67,8 @@ pipeline {
             steps {
                 echo '🏗️ Building frontend...'
                 sh '''
-                    if [ -f frontend/package.json ]; then
-                        cd frontend
+                    if [ -f $APP_DIR/frontend/package.json ]; then
+                        cd $APP_DIR/frontend
                         npm run build || echo "Static HTML app detected — skipping build."
                     fi
                 '''
@@ -78,7 +79,7 @@ pipeline {
             steps {
                 echo '🧪 Testing backend (basic start check)...'
                 sh '''
-                    cd backend
+                    cd $APP_DIR/backend
                     node -e "require('./server'); console.log('✅ Backend loaded successfully')"
                 '''
             }
@@ -88,7 +89,7 @@ pipeline {
             steps {
                 echo '🐳 Building Docker image...'
                 sh '''
-                    docker build -t $IMAGE_NAME:$IMAGE_TAG .
+                    docker build -t $IMAGE_NAME:$IMAGE_TAG $APP_DIR
                 '''
             }
         }
