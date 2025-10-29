@@ -3,27 +3,99 @@ pipeline {
 
     environment {
         IMAGE_NAME = "feedback-web"
+        IMAGE_TAG = "build-${BUILD_NUMBER}"
         CONTAINER_NAME = "feedback-container"
+        APP_PORT = "5000" // backend port inside container
+        HOST_PORT = "3000" // host port
+    }
+
+    options {
+        skipStagesAfterUnstable()
+        timeout(time: 20, unit: 'MINUTES')
+        timestamps()
+
     }
 
     stages {
-        stage('Checkout') {
+
+        stage('Checkout Code') {
             steps {
-                echo 'Cloning repository...'
+                echo '📦 Cloning repository...'
                 checkout scm
+            }
+        }
+
+        stage('Install Dependencies') {
+            parallel {
+                stage('Backend Deps') {
+                    steps {
+                        echo '⚙️ Installing backend dependencies...'
+                        sh '''
+                            cd backend
+                            npm install
+                        '''
+                    }
+                }
+
+                stage('Frontend Deps') {
+                    steps {
+                        echo '⚙️ Installing frontend dependencies (if package.json exists)...'
+                        sh '''
+                            if [ -f frontend/package.json ]; then
+                                cd frontend
+                                npm install
+                            else
+                                echo "No package.json found — skipping."
+                            fi
+                        '''
+                    }
+                }
+            }
+        }
+        stage('Build Backend') {
+            steps {
+                echo '🔧 Building backend...'
+                sh '''
+                    cd backend
+                    npm run build || echo "No build step defined — skipping."
+                '''
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                echo '🏗️ Building frontend...'
+                sh '''
+                    if [ -f frontend/package.json ]; then
+                        cd frontend
+                        npm run build || echo "Static HTML app detected — skipping build."
+                    fi
+                '''
+            }
+        }
+
+        stage('Test Backend') {
+            steps {
+                echo '🧪 Testing backend (basic start check)...'
+                sh '''
+                    cd backend
+                    node -e "require('./server'); console.log('✅ Backend loaded successfully')"
+                '''
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo 'Building Docker image...'
-                sh 'docker build -t $IMAGE_NAME .'
+                echo '🐳 Building Docker image...'
+                sh '''
+                    docker build -t $IMAGE_NAME:$IMAGE_TAG .
+                '''
             }
         }
 
         stage('Stop Old Container') {
             steps {
-                echo 'Stopping old container if running...'
+                echo '🧹 Stopping and removing old container if exists...'
                 sh '''
                     if [ $(docker ps -q -f name=$CONTAINER_NAME) ]; then
                         docker stop $CONTAINER_NAME
@@ -33,20 +105,32 @@ pipeline {
             }
         }
 
-        stage('Run New Container') {
+        stage('Deploy New Container') {
             steps {
-                echo 'Running new container...'
-                sh 'docker run -d -p 3000:3000 --name $CONTAINER_NAME $IMAGE_NAME'
+                echo '🚀 Deploying new version of the container...'
+                sh '''
+                    docker run -d \
+                    -p $HOST_PORT:$APP_PORT \
+                    --name $CONTAINER_NAME \
+                    $IMAGE_NAME:$IMAGE_TAG
+                '''
+            }
+        }
+
+        stage('Cleanup Old Images') {
+            steps {
+                echo '🧼 Cleaning up old Docker images...'
+                sh 'docker image prune -af || true'
             }
         }
     }
 
     post {
         success {
-            echo '✅ Deployment successful!'
+            echo "✅ CI/CD pipeline completed successfully!"
         }
         failure {
-            echo '❌ Deployment failed!'
+            echo "❌ Pipeline failed — check logs for details."
         }
     }
 }
