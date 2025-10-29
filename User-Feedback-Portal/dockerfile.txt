@@ -9,6 +9,8 @@ WORKDIR /app/frontend
 # Copy static frontend files (HTML, CSS, JS)
 COPY frontend/ ./
 
+RUN npm install
+
 
 # ------------------------------
 # Stage 2: Setup backend
