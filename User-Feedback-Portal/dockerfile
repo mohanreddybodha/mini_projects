@@ -1,42 +1,38 @@
 # ------------------------------
-# Stage 1: Build frontend
+# Stage 1: Frontend setup
 # ------------------------------
-# Use Node.js Alpine image (lightweight version)
 FROM node:alpine AS frontend-build
 
-# Set working directory inside container
 WORKDIR /app/frontend
 
-# Copy only frontend source files
-COPY frontend/ ./ 
+# Copy static frontend files
+COPY frontend/ ./
 
-# Install dependencies for frontend
-RUN npm install
+# Install dependencies (if package.json exists)
+RUN if [ -f package.json ]; then npm install; fi
 
-# Build static files (optimized for production)
-RUN npm run build
-
+# If you add a build step later (for React/Vue)
+# RUN npm run build
 
 
 # ------------------------------
-# Stage 2: Setup backend
+# Stage 2: Backend setup
 # ------------------------------
 FROM node:alpine
 
-# Set working directory for backend
 WORKDIR /app/backend
 
 # Copy backend files
-COPY backend/ ./ 
+COPY backend/ ./
 
 # Install backend dependencies
 RUN npm install
 
-# Copy frontend build output into backend (so backend can serve static files)
-COPY --from=frontend-build /app/frontend/build ./public
+# Copy frontend static files into backend public folder
+COPY --from=frontend-build /app/frontend ./public
 
 # Expose backend port
 EXPOSE 5000
 
-# Start the backend server
+# Start backend server
 CMD ["node", "server.js"]
