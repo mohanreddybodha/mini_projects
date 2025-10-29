@@ -39,6 +39,69 @@ It is deployed on an **AWS EC2 instance** or **S3 bucket** for static hosting.
 
 ````
 
+## 🚀 Launching an Amazon EC2 Instance (Amazon Linux)
+
+Follow these steps to create and connect to an EC2 instance on AWS:
+
+### 1. Create an EC2 Instance
+
+1. Sign in to your [AWS Management Console](https://aws.amazon.com/console/).
+2. Navigate to **Services → EC2 → Instances → Launch Instance**.
+3. Provide a name (e.g., `my-ec2-instance`).
+4. **Choose AMI:** Select **Amazon Linux 2 (Free Tier Eligible)**.
+5. **Instance type:** Select `t2.micro` (Free Tier).
+6. **Key pair:**
+
+   * Choose **Create new key pair**, download the `.pem` file, and keep it safe.
+7. **Network settings:** Leave default or allow HTTP/HTTPS if you’ll host a web app.
+8. Click **Launch Instance**.
+
+### 2. Connect to Your Instance
+
+Once the instance state is **Running**:
+
+1. Select your instance → Click **Connect** → Choose **SSH client** tab.
+2. Copy the provided SSH command. It will look like this:
+
+   ```bash
+   ssh -i "your-key.pem" ec2-user@<public-ip-address>
+   ```
+3. Open your terminal, navigate to the directory where your key file is stored, and run the command:
+
+   ```bash
+   chmod 400 your-key.pem
+   ssh -i "your-key.pem" ec2-user@<public-ip-address>
+   ```
+4. You are now inside your EC2 instance.
+
+---
+
+## 🛠️ Installing Git on Amazon Linux
+
+Once connected to your EC2 terminal:
+
+```bash
+# Update system packages
+sudo yum update -y
+
+# Install Git
+sudo yum install git -y
+
+# Verify installation
+git --version
+```
+
+You’ll see output like:
+
+```
+git version 2.x.x
+```
+
+Git is now successfully installed on your EC2 instance. 🎉
+
+---
+
+
 ---
 
 ## 🧱 Dockerfile Explanation
@@ -73,8 +136,7 @@ cd mini_projects
 For Ubuntu (EC2 or local system):
 
 ```bash
-sudo apt update
-sudo apt install docker.io -y
+sudo yum install docker -y
 ```
 
 To verify Docker installation:
@@ -90,13 +152,13 @@ docker --version
 ### 🧩 Build the Image
 
 ```bash
-sudo docker build -t mohanreddybodha/static-site .
+sudo docker build -t image_name .
 ```
 
 ### 🚀 Run the Container
 
 ```bash
-sudo docker run -d -p 80:80 mohanreddybodha/static-site
+sudo docker run -d -p 80:80 image_name
 ```
 
 Now open your browser and visit:
