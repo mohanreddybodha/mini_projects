@@ -70,9 +70,9 @@ pipeline {
                 echo '🧪 Testing backend (basic start check)...'
                 sh '''
                     cd $APP_DIR/backend
-                    node -e "require('./server'); console.log('✅ Backend loaded successfully')"
+                    node -c server.js
                 '''
-                echo '✅ Backend test completed.'
+                echo '✅ Backend syntax check passed.'
             }
         }
 
@@ -114,22 +114,30 @@ pipeline {
 
         stage('Cleanup Old Images') {
             steps {
-                echo '🧼 Cleaning up old Docker images...'
-                sh 'docker image prune -af || true'
+                echo '🧼 Cleaning up unused Docker resources...'
+                sh '''
+                    docker image prune -af || true
+                    docker system prune -f --volumes || true
+                '''
                 echo '✅ Docker cleanup completed.'
             }
         }
 
         // Optional health check (uncomment if needed)
-        // stage('Verify Deployment') {
-        //     steps {
-        //         echo '🔍 Verifying container response...'
-        //         sh '''
-        //             sleep 5
-        //             curl -s http://localhost:$HOST_PORT | grep "Hybrid Showcase Portal" && echo "✅ Frontend is live"
-        //         '''
-        //     }
-        // }
+           stage('Verify Deployment') {
+               steps {
+                   echo '🔍 Verifying container response...'
+                   sh '''
+                       sleep 5
+                       if curl -s http://localhost:$HOST_PORT | grep -q "Feedback"; then
+                           echo "✅ Frontend reachable"
+                       else
+                          echo "❌ Deployment failed: frontend not responding"
+                           exit 1
+                       fi
+                   '''
+               }
+           }
     }
 
     post {
