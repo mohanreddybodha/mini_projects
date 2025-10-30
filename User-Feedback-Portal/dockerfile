@@ -11,9 +11,6 @@ COPY frontend/ ./
 # Install dependencies (if package.json exists)
 RUN if [ -f package.json ]; then npm install; fi
 
-# If you add a build step later (for React/Vue)
-# RUN npm run build
-
 
 # --------------------------
 # Stage 2: Backend setup

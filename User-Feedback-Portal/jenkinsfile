@@ -20,9 +20,9 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                echo '📦 Cloning repository...'
+                echo ' Cloning repository...'
                 checkout scm
-                echo '✅ Code checkout completed.'
+                echo ' Code checkout completed.'
             }
         }
 
@@ -30,23 +30,23 @@ pipeline {
             parallel {
                 stage('Backend Deps') {
                     steps {
-                        echo '⚙️ Installing backend dependencies...'
+                        echo ' Installing backend dependencies...'
                         sh '''
                             cd $APP_DIR/backend
                             npm install
                         '''
-                        echo '✅ Backend dependencies installed.'
+                        echo ' Backend dependencies installed.'
                     }
                 }
 
                 stage('Frontend Deps') {
                     steps {
-                        echo '⚙️ Installing frontend dependencies...'
+                        echo ' Installing frontend dependencies...'
                         sh '''
                             cd $APP_DIR/frontend
                             npm install
                         '''
-                        echo '✅ Frontend dependencies installed.'
+                        echo ' Frontend dependencies installed.'
                     }
                 }
             }
@@ -54,98 +54,83 @@ pipeline {
 
         stage('Build Frontend') {
             steps {
-                echo '🏗️ Building frontend...'
+                echo ' Building frontend...'
                 sh '''
                     cd $APP_DIR/frontend
                     npm run build || echo "Static HTML app detected — skipping build."
                     mkdir -p ../backend/public
                     cp index.html style.css ../backend/public/
                 '''
-                echo '✅ Frontend build and copy completed.'
+                echo ' Frontend build and copy completed.'
             }
         }
 
         stage('Test Backend') {
             steps {
-                echo '🧪 Testing backend (basic start check)...'
+                echo ' Testing backend (basic start check)...'
                 sh '''
                     cd $APP_DIR/backend
                     node -c server.js
                 '''
-                echo '✅ Backend syntax check passed.'
+                echo ' Backend syntax check passed.'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo '🐳 Building Docker image...'
+                echo ' Building Docker image...'
                 sh '''
                     docker build -t $IMAGE_NAME:$IMAGE_TAG $APP_DIR
                 '''
-                echo '✅ Docker image built.'
+                echo ' Docker image built.'
             }
         }
 
         stage('Stop Old Container') {
             steps {
-                echo '🧹 Stopping and removing old container if exists...'
+                echo ' Stopping and removing old container if exists...'
                 sh '''
                     if [ $(docker ps -q -f name=$CONTAINER_NAME) ]; then
                         docker stop $CONTAINER_NAME
                         docker rm $CONTAINER_NAME
                     fi
                 '''
-                echo '✅ Old container cleaned up.'
+                echo ' Old container cleaned up.'
             }
         }
 
         stage('Deploy New Container') {
             steps {
-                echo '🚀 Deploying new version of the container...'
+                echo ' Deploying new version of the container...'
                 sh '''
                     docker run -d \
                     -p $HOST_PORT:$APP_PORT \
                     --name $CONTAINER_NAME \
                     $IMAGE_NAME:$IMAGE_TAG
                 '''
-                echo '✅ Container deployed.'
+                echo ' Container deployed.'
             }
         }
 
         stage('Cleanup Old Images') {
             steps {
-                echo '🧼 Cleaning up unused Docker resources...'
+                echo ' Cleaning up unused Docker resources...'
                 sh '''
                     docker image prune -af || true
                     docker system prune -f --volumes || true
                 '''
-                echo '✅ Docker cleanup completed.'
+                echo ' Docker cleanup completed.'
             }
         }
 
-        // Optional health check (uncomment if needed)
-           stage('Verify Deployment') {
-               steps {
-                   echo '🔍 Verifying container response...'
-                   sh '''
-                       sleep 5
-                       if curl -s http://localhost:$HOST_PORT | grep -q "Feedback"; then
-                           echo "✅ Frontend reachable"
-                       else
-                          echo "❌ Deployment failed: frontend not responding"
-                           exit 1
-                       fi
-                   '''
-               }
-           }
     }
 
     post {
         success {
-            echo "✅ CI/CD pipeline completed successfully!"
+            echo " CI/CD pipeline completed successfully!"
         }
         failure {
-            echo "❌ Pipeline failed — check logs for details."
+            echo " Pipeline failed — check logs for details."
         }
     }
 }
