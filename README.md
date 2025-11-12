@@ -115,7 +115,7 @@ sudo yum install java-17-amazon-corretto -y          #To install Jenkins we need
 java -version 
 # Verify Java installation
 
-sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat stable/jenkins.repo  
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo  
 # Download and save the official Jenkins repository configuration so yum can fetch Jenkins packages
 
 
@@ -128,16 +128,16 @@ sudo yum install fontconfig java-17-amazon-corretto -y
 sudo yum install jenkins -y 
 # Install Jenkins package from the Jenkins yum repository 
 
-sudo usermod -aG docker Jenkins
+sudo usermod -aG docker jenkins
 # Add the Jenkins user to the 'docker' group so Jenkins can run Docker commands without permission errors
 
 sudo systemctl restart docker
 # Restart Docker service to update group permissions changes
 
-sudo systemctl start Jenkins    
+sudo systemctl start jenkins    
 # Start Jenkins service 
 
-sudo systemctl enable Jenkins     
+sudo systemctl enable jenkins     
 # Enable Jenkins to start automatically on server boot
 
 ```
@@ -192,6 +192,7 @@ Follow setup steps and install suggested plugins.
 ```
 https://github.com/mohanreddybodha/CiCD-pipeline-project-using-jenkins.git
 ```
+* Branch: main
 
 * Script Path:
 
